@@ -4,6 +4,7 @@ include __DIR__ . '/../vendor/autoload.php';
 use phpspider\core\phpspider;
 use phpspider\core\requests;
 use phpspider\core\selector;
+use phpspider\core\db;
 
 /* Do NOT delete this comment */
 /* 不要删除这段注释 */
@@ -24,7 +25,8 @@ $configs = array(
         // 随便定义一个入口，要不然会报没有入口url错误，但是这里其实没用
         // "http://www.mafengwo.cn/travel-scenic-spot/mafengwo/10198.html",
         // "https://www.qidian.com/rank",
-        "https://book.qidian.com/info/1009533893",
+        // "https://book.qidian.com/info/1009533893",
+        "https://www.kmway.com/news/index.shtml",
     ),
     'list_url_regexes' => array(
         // 城市列表页
@@ -32,45 +34,53 @@ $configs = array(
         // 文章列表页
         // "http://www.mafengwo.cn/gonglve/ajax.php\?act=get_travellist\&mddid=\d+",
         // 小说章节列表
-        // "book.qidian.com/info/\d+",
+        "book.qidian.com/info/\d+",
     ),
     'content_url_regexes' => array(
         // "http://www.mafengwo.cn/i/\d+.html",
-        "read.qidian.com/chapter/\.+",
+        "read.qidian.com/chapter/[a-zA-Z0-9-_/]*",
     ),
     //'export' => array(
         //'type' => 'db', 
         //'table' => 'mafengwo_content',
     //),
-    /*'db_config' => array(
+    'db_config' => array(
         'host'  => '127.0.0.1',
         'port'  => 3306,
         'user'  => 'root',
         'pass'  => 'wuyanfeng1688',
         'name'  => 'mafengwo',
-    ),*/
+    ),
     'fields' => array(
-        // 标题
         array(
             'name' => "title",
             'selector' => "//h3[contains(@class,'j_chapterName')]",
-            //'selector' => "//div[@id='Article']//h1",
             'required' => true,
         ),
-        // 分类
-        /*array(
-            'name' => "city",
+        array(
+            'name' => "content",
             'selector' => "//div[contains(@class,'relation_mdd')]//a",
             'required' => true,
         ),
-        // 出发时间
         array(
-            'name' => "date",
+            'name' => "author",
             'selector' => "//li[contains(@class,'time')]",
             'required' => true,
-        ),*/
+        ),
+        array(
+            'name' => "time",
+            'selector' => "//li[contains(@class,'time')]",
+            'required' => true,
+        ),
+        array(
+            'name' => "source",
+            'selector' => "//li[contains(@class,'time')]",
+            'required' => true,
+        ),
     ),
 );
+db::set_connect('default', $configs['db_config']);
+db::init_mysql();
 $spider = new phpspider($configs);
 $spider->on_start = function($phpspider) {
     requests::set_header('Referer','http://www.mafengwo.cn/mdd/citylist/21536.html');
@@ -98,12 +108,12 @@ $spider->on_start = function($phpspider) {
     requests::set_client_ip($ips);
 };
 $spider->on_extract_field = function($fieldname, $data, $page) {
-    echo $data;
     return $data;
 };
 
 $spider->on_extract_page = function($page, $data) {
-    echo $data;
+    // echo $data['city'] . '22222222222222222222222222222222222';
+    // db::insert('mafengwo_content', $data);
     return $data;
 };
 $spider->start();
