@@ -10,7 +10,7 @@ use phpspider\core\db;
 /* 不要删除这段注释 */
 
 $configs = array(
-    'name' => '快马加盟网——资讯',
+    'name' => '快马加盟网——项目',
     'tasknum' => 1,
     //'save_running_state' => true,
     'log_show' => false,
@@ -21,30 +21,16 @@ $configs = array(
     ),
     'scan_urls' => array(
         // 随便定义一个入口，要不然会报没有入口url错误，但是这里其实没用
-        // "http://www.mafengwo.cn/travel-scenic-spot/mafengwo/10198.html",
-        // "https://www.qidian.com/rank",
-        // "https://book.qidian.com/info/1009533893",
-        "https://www.kmway.com/case/",
+        // 项目库列表第一页
+        "https://www.kmway.com/project/search/1_0_0.shtml",
     ),
     'list_url_regexes' => array(
-        // 城市列表页
-        // "http://www.mafengwo.cn/mdd/base/list/pagedata_citylist\?page=\d+",
-        // 文章列表页
-        // "http://www.mafengwo.cn/gonglve/ajax.php\?act=get_travellist\&mddid=\d+",
-        // 小说章节列表
-        // "book.qidian.com/info/\d+",
-        "https://www.kmway.com/case/index_\d+.shtml",
-        "https://www.kmway.com/library/index_\d+.shtml",
-        "https://www.kmway.com/zt/index_\d+.shtml",
-        "https://www.kmway.com/news/index_\d+.shtml",
+        // 项目库列表
+        "https://www.kmway.com/project/search/\d+_0_0.shtml",
     ),
     'content_url_regexes' => array(
-        // "http://www.mafengwo.cn/i/\d+.html",
-        // "read.qidian.com/chapter/[a-zA-Z0-9-_/]*",
-        "https://www.kmway.com/case/\d+.shtml",
-        "https://www.kmway.com/library/\d+.shtml",
-        "https://www.kmway.com/zt/\d+.shtml",
-        "https://www.kmway.com/news/\d+.shtml",
+        // 项目海报/详情页
+        "https://www.kmway.com/project/[a-zA-Z0-9]*/[a-zA-Z0-9]*/\d+.shtml",
     ),
     //'export' => array(
         //'type' => 'db', 
@@ -59,28 +45,53 @@ $configs = array(
     ),
     'fields' => array(
         array(
-            'name' => "title",
-            'selector' => "//div[contains(@id,'tab')]//div[contains(@class,'title')]",
+            'name' => "brand", // 项目品牌
+            'selector' => "/html/body/div[@class='Poster']/div[@class='shop-name-w']/div[@class='shop-name']/div[@class='container clearfix']/div[@class='shop-name-left f-l clearfix']/div[@class='name-left-referral f-l']/h3",
             'required' => true,
         ),
         array(
-            'name' => "content",
-            'selector' => "//div[contains(@id,'tab')]//div[contains(@class,'artical')]",
+            'name' => "company_name", // 公司名称
+            'selector' => "/html/body/div[@class='Poster']/div[@class='shop-name-w']/div[@class='shop-name']/div[@class='container clearfix']/div[@class='shop-name-left f-l clearfix']/div[@class='name-left-referral f-l']/p",
             'required' => true,
         ),
         array(
-            'name' => "author",
-            'selector' => "/html/body/div[@class='container clearfix']/div[@class='left-ctn l clearfix Common']/div[@id='tab']/div[@class='detail-ctn']/div[@class='publish clearfix']/ul[@class='publish-time l']/li[@class='l'][2]",
+            'name' => "quota", // 投资金额
+            'selector' => "/html/body/div[@class='Poster']/div[@class='shop-name-w']/div[@class='shop-name']/div[@class='container clearfix']/div[@class='shop-name-left f-l clearfix']/div[@class='name-left-referral f-l']/div[@class='ref-star clearfix']/span[@class='f-l ref-star-span2']/i",
             'required' => true,
         ),
         array(
-            'name' => "time",
-            'selector' => "//div[contains(@id,'tab')]//ul[contains(@class,'publish-time')]//span",
+            'name' => "item_logo", // 项目logo
+            'selector' => "/html/body/div[@class='Poster']/div[@class='shop-name-w']/div[@class='shop-name']/div[@class='container clearfix']/div[@class='shop-name-left f-l clearfix']/div[@class='name-left-img f-l']/a/img/@src",
             'required' => true,
         ),
         array(
-            'name' => "source",
-            'selector' => "/html/body/div[@class='container clearfix']/div[@class='left-ctn l clearfix Common']/div[@id='tab']/div[@class='detail-ctn']/div[@class='publish clearfix']/ul[@class='publish-time l']/li[@class='l'][3]",
+            'name' => "poster", // 项目PC海报源码
+            'selector' => "//div[@class='shop-Poster']",
+            'required' => true,
+        ),
+        array(
+            'name' => "industry", // 行业
+            'selector' => "//div[@class='name-left-guild f-l']/p/span[2]",
+            'required' => true,
+        ),
+        array(
+            'name' => "industry", // 公司logo
+            'selector' => "//div[@class='comp_logo']/img/@src",
+            'required' => true,
+        ),
+        array(
+            'name' => "register_capital", // 注册资金
+            'selector' => "//div[@class='comp_info_con']/ul/li[2]/em",
+            'required' => true,
+        ),
+        array(
+            'name' => "address", // 注册地址
+            'selector' => "//div[@class='comp_info_con']/ul/li[3]/em",
+            'required' => true,
+        ),
+        array(
+            'name' => "content", // 项目详情
+            'selector' => "//div[@id='con']",
             'required' => true,
         ),
     ),
@@ -157,15 +168,13 @@ $spider->on_extract_page = function($page, $data) {
     return $data;
 };
 $spider->start();
-/*$url = "https://www.kmway.com/case/776600.shtml";
+/*$url = "https://www.kmway.com/project/cyyl/dg/751507.shtml";
 $html = requests::get($url);
 
-$selector = "//div[contains(@id,'tab')]//div[contains(@class,'title')]";
+$selector = "//div[@id='con']";
 
 $result = selector::select($html, $selector);
-print_r($result);
-$result = mb_substr($result, 4); 来源
-$result = mb_substr($result, 4); 作者
-$result = trim($result); 时间
+// print_r($html);
+
 print_r("<br>");
 print_r($result);*/
