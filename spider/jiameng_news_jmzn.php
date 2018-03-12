@@ -10,27 +10,33 @@ use phpspider\core\db;
 /* 不要删除这段注释 */
 
 $configs = array(
-    'name' => '959——资讯——节能环保',
+    'name' => '全球加盟网——资讯——节能环保',
     'tasknum' => 1,
     //'save_running_state' => true,
     'log_show' => false,
     //'log_file' => 'data.log',
     //'log_type' => 'info',
     'domains' => array(
-        'news.959.cn',
+        'www.jiameng.com',
     ),
     'scan_urls' => array(
         // 随便定义一个入口，要不然会报没有入口url错误，但是这里其实没用
         // 节能环保咨询列表第一页
-        "http://news.959.cn/canyin/yinpin/index.shtml",
+        "http://www.jiameng.com/zixun/newslist/261_1.htm",
     ),
     'list_url_regexes' => array(
         // 节能环保咨询列表
-        "http://news.959.cn/canyin/yinpin/\d+.shtml",
+        "http://www.jiameng.com/zixun/newslist/261_\d+.htm",
+        "http://www.jiameng.com/zixun/newslist/262_\d+.htm",
+        "http://www.jiameng.com/zixun/newslist/263_\d+.htm",
+        "http://www.jiameng.com/zixun/newslist/264_\d+.htm",
+        "http://www.jiameng.com/zixun/newslist/259_\d+.htm",
+        "http://www.jiameng.com/zixun/newslist/280_\d+.htm",
     ),
     'content_url_regexes' => array(
         // 节能环保咨询详情页
         "http://news.959.cn/\d+/\d+/\d+.shtml",
+        "http://www.jiameng.com/zixun/news/[a-zA-Z0-9]*.htm",
     ),
     //'export' => array(
         //'type' => 'db', 
@@ -46,17 +52,27 @@ $configs = array(
     'fields' => array(
         array(
             'name' => "title", // 资讯标题
-            'selector' => "//h3[@class='ar-title']",
+            'selector' => "//h1[@class='title']",
             'required' => true,
         ),
         array(
             'name' => "content", // 资讯内容
-            'selector' => "//div[@class='detail']",
+            'selector' => "//div[@id='endText']",
+            'required' => true,
+        ),
+        array(
+            'name' => "time", // 发布时间
+            'selector' => "//div[@class='s_title']/span[1]",
+            'required' => true,
+        ),
+        array(
+            'name' => "source", // 文章来源
+            'selector' => "//div[@class='s_title']/span[2]/a",
             'required' => true,
         ),
     ),
 );
-db::set_connect('default', $configs['db_config']);
+/*db::set_connect('default', $configs['db_config']);
 db::init_mysql();
 $spider = new phpspider($configs);
 $spider->on_start = function($phpspider) {
@@ -87,9 +103,34 @@ $spider->on_start = function($phpspider) {
 
 $spider->on_scan_page = function($page, $content, $phpspider) 
 {
-    for ($i = 2; $i <= 155; $i++) {
-        // 全国热点城市
-        $url = "http://news.959.cn/canyin/yinpin/{$i}.shtml";
+    for ($i = 2; $i <= 259; $i++) {
+        // 加盟指南文章列表
+        $url = "http://www.jiameng.com/zixun/newslist/261_{$i}.htm";
+        $phpspider->add_url($url);
+    }
+    for ($j = 1; $j <= 191; $j++) {
+        // 加盟指南文章列表
+        $url = "http://www.jiameng.com/zixun/newslist/262_{$j}.htm";
+        $phpspider->add_url($url);
+    }
+    for ($m = 1; $m <= 78; $m++) {
+        // 加盟指南文章列表
+        $url = "http://www.jiameng.com/zixun/newslist/263_{$m}.htm";
+        $phpspider->add_url($url);
+    }
+    for ($n = 1; $n <= 67; $n++) {
+        // 加盟指南文章列表
+        $url = "http://www.jiameng.com/zixun/newslist/280_{$n}.htm";
+        $phpspider->add_url($url);
+    }
+    for ($k = 1; $k <= 18; $k++) {
+        // 加盟指南文章列表
+        $url = "http://www.jiameng.com/zixun/newslist/264_{$k}.htm";
+        $phpspider->add_url($url);
+    }
+    for ($a = 1; $a <= 15; $a++) {
+        // 加盟指南文章列表
+        $url = "http://www.jiameng.com/zixun/newslist/259_{$a}.htm";
         $phpspider->add_url($url);
     }
 };
@@ -99,20 +140,20 @@ $spider->on_extract_field = function($fieldname, $data, $page) {
 };
 
 $spider->on_extract_page = function($page, $data) {
-    $row = db::get_one("Select Count(*) As `count` From `959_news_jnhb` Where `title`='{$data['title']}'");
+    $row = db::get_one("Select Count(*) As `count` From `jiameng_news_jmzn` Where `title`='{$data['title']}'");
     if (!$row['count']) {
-        db::insert('959_news_jnhb', $data);
+        db::insert('jiameng_news_jmzn', $data);
     }
     return $data;
 };
-$spider->start();
-/*$url = "http://news.959.cn/2017/0103/4165857.shtml";
+$spider->start();*/
+$url = "http://www.jiameng.com/zixun/news/8714j7970217.htm";
 $html = requests::get($url);
 
-$selector = "//div[@class='detail']";
+$selector = "//div[@id='endText']";
 
 $result = selector::select($html, $selector);
-// print_r($html);
+print_r($html);
 
 print_r("<br>");
-print_r($result);*/
+print_r($result);
