@@ -71,11 +71,11 @@ $configs = array(
         ),
         array(
             'name' => "industry", // 行业
-            'selector' => "//div[@class='name-left-guild f-l']/p/span[2]",
+            'selector' => "//div[@class='name-left-guild f-l']/p[2]/span[2]",
             'required' => true,
         ),
         array(
-            'name' => "industry", // 公司logo
+            'name' => "company_logo", // 公司logo
             'selector' => "//div[@class='comp_logo']/img/@src",
             'required' => true,
         ),
@@ -127,43 +127,21 @@ $spider->on_start = function($phpspider) {
 
 $spider->on_scan_page = function($page, $content, $phpspider) 
 {
-    for ($i = 2; $i <= 12; $i++) {
+    for ($i = 2; $i <= 542; $i++) {
         // 全国热点城市
-        $url = "https://www.kmway.com/case/index_{$i}.shtml";
-        $phpspider->add_url($url);
-    }
-    for ($i = 2; $i <= 49; $i++) {
-        // 全国热点城市
-        $url = "https://www.kmway.com/library/index_{$i}.shtml";
-        $phpspider->add_url($url);
-    }
-    for ($i = 2; $i <= 18; $i++) {
-        // 全国热点城市
-        $url = "https://www.kmway.com/zt/index_{$i}.shtml";
-        $phpspider->add_url($url);
-    }
-    for ($i = 2; $i <= 30; $i++) {
-        // 全国热点城市
-        $url = "https://www.kmway.com/news/index_{$i}.shtml";
+        $url = "https://www.kmway.com/project/search/{$i}_0_0.shtml";
         $phpspider->add_url($url);
     }
 };
 
 $spider->on_extract_field = function($fieldname, $data, $page) {
-    if ($fieldname == 'author' || $fieldname == 'source') {
-        $data = mb_substr($data, 4);
-    }
-    if ($fieldname == 'time') {
-        trim($data);
-    }
     return $data;
 };
 
 $spider->on_extract_page = function($page, $data) {
-    // echo $data['city'] . '22222222222222222222222222222222222';
-    $row = db::get_one("Select Count(*) As `count` From `news` Where `title`='{$data['title']}'");
+    $row = db::get_one("Select Count(*) As `count` From `kuaima_item` Where `brand`='{$data['brand']}'");
     if (!$row['count']) {
-        db::insert('news', $data);
+        db::insert('kuaima_item', $data);
     }
     return $data;
 };
@@ -171,7 +149,7 @@ $spider->start();
 /*$url = "https://www.kmway.com/project/cyyl/dg/751507.shtml";
 $html = requests::get($url);
 
-$selector = "//div[@id='con']";
+$selector = "//div[@class='name-left-guild f-l']/p[2]/span[2]";
 
 $result = selector::select($html, $selector);
 // print_r($html);
