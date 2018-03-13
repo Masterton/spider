@@ -22,11 +22,11 @@ $configs = array(
     'scan_urls' => array(
         // 随便定义一个入口，要不然会报没有入口url错误，但是这里其实没用
         // 节能环保咨询列表第一页
-        "http://zixun.3158.cn/cyms/",
+        "http://zixun.3158.cn/hbjx/",
     ),
     'list_url_regexes' => array(
         // 节能环保咨询列表
-        "http://zixun.3158.cn/cyms/\d.html",
+        "http://zixun.3158.cn/hbjx/\d.html",
     ),
     'content_url_regexes' => array(
         // 节能环保咨询详情页
@@ -94,7 +94,7 @@ $spider->on_scan_page = function($page, $content, $phpspider)
 {
     for ($i = 2; $i <= 50; $i++) {
         // 全国热点城市
-        $url = "http://zixun.3158.cn/cyms/{$i}.html";
+        $url = "http://zixun.3158.cn/hbjx/{$i}.html";
         $phpspider->add_url($url);
     }
 };
